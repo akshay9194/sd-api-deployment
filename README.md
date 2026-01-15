@@ -11,34 +11,37 @@ Features:
 
 ## Quick Deploy (RunPod)
 
+### Start Command (One-liner)
+
+Copy this entire command into RunPod Pod "Start Command":
+
+```bash
+bash -c "apt-get update && apt-get install -y wget git && pip install fastapi uvicorn httpx aiofiles Pillow python-multipart && if [ ! -d '/workspace/ComfyUI' ]; then cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git && cd ComfyUI && pip install -r requirements.txt; fi && if [ ! -f '/workspace/ComfyUI/models/checkpoints/juggernautXL_v9.safetensors' ]; then mkdir -p /workspace/ComfyUI/models/checkpoints && cd /workspace/ComfyUI/models/checkpoints && wget -q 'https://civitai.com/api/download/models/357609?type=Model&format=SafeTensor&size=pruned&fp=fp16' -O juggernautXL_v9.safetensors; fi && cd /workspace/ComfyUI && python main.py --listen 0.0.0.0 --port 8188 &>/dev/null & sleep 10 && rm -rf /workspace/sd-api && git clone https://github.com/akshay9194/sd-api-deployment.git /workspace/sd-api && cd /workspace/sd-api/app && uvicorn server:app --host 0.0.0.0 --port 8000"
+```
+
+### What the Start Command Does
+
+1. Installs system dependencies (wget, git)
+2. Installs Python packages (fastapi, uvicorn, etc.)
+3. Clones ComfyUI (if not in network volume)
+4. Downloads Juggernaut-XL model (if not exists) - ~6.5GB
+5. Starts ComfyUI in background (port 8188)
+6. Clones this SD API repo
+7. Starts FastAPI server (port 8000)
+
 ### Prerequisites
-1. Network Volume (100GB recommended) with ComfyUI + models
-2. GPU Pod (RTX 4090 or better)
 
-### Option 1: ComfyUI Template (Recommended)
+1. **Network Volume** (50GB+) attached to `/workspace`
+2. **GPU Pod**: RTX 4090 recommended (or RTX 3090)
+3. **Template**: PyTorch or RunPod Pytorch
+4. **Expose Port**: 8000
 
-1. **Deploy Pod** with "ComfyUI" template on RunPod
-2. **Download Model** (in Pod terminal):
-```bash
-cd /workspace/ComfyUI/models/checkpoints
-wget "https://civitai.com/api/download/models/357609" -O juggernautXL_v9.safetensors
-```
+### First Run vs Subsequent
 
-3. **Clone API** and start:
-```bash
-cd /workspace
-git clone https://github.com/YOUR_USERNAME/sd-api-deployment.git
-cd sd-api-deployment
-pip install -r app/requirements.txt
-cd app && uvicorn server:app --host 0.0.0.0 --port 8000
-```
-
-### Option 2: One-Line Start Command
-
-For RunPod Pod start command:
-```bash
-cd /workspace && git clone https://github.com/YOUR_USERNAME/sd-api-deployment.git api && pip install -r api/app/requirements.txt && cd api/app && uvicorn server:app --host 0.0.0.0 --port 8000
-```
+| Scenario | Time | Notes |
+|----------|------|-------|
+| First time | 5-10 min | Downloads ComfyUI + model |
+| Spot restart | 30-60 sec | Everything cached in volume |
 
 ### Environment Variables
 

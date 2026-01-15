@@ -1,0 +1,36 @@
+# Dependencies
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output
+outputs/
+*.png
+*.jpg
+*.jpeg
+
+# Secrets (should never be committed)
+.env
+.env.local
+*.key
+*.pem
+
+# Logs
+*.log
+logs/

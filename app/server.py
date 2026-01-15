@@ -48,7 +48,7 @@ security = HTTPBearer(auto_error=False)
 # ═══════════════════════════════════════════════════════════════
 COMFYUI_URL = os.getenv("COMFYUI_URL", "http://127.0.0.1:8188")
 API_KEY = os.getenv("API_KEY", "")
-OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/workspace/outputs"))
+OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/workspace/ComfyUI/output"))
 DEFAULT_STEPS = int(os.getenv("DEFAULT_STEPS", "25"))
 DEFAULT_CFG = float(os.getenv("DEFAULT_CFG", "7.0"))
 DEFAULT_WIDTH = int(os.getenv("DEFAULT_WIDTH", "1024"))
@@ -272,15 +272,15 @@ async def queue_prompt(workflow: dict) -> str:
             raise HTTPException(500, f"ComfyUI error: {response.text}")
         return response.json()["prompt_id"]
 
-async def wait_for_completion(prompt_id: str, timeout: int = 120) -> dict:
-    """Wait for ComfyUI to complete generation"""
+async def wait_for_completion(prompt_id: str, timeout: int = 300) -> dict:
+    """Wait for ComfyUI to complete generation (5 min timeout for first-run model loading)"""
     async with httpx.AsyncClient() as client:
         start_time = asyncio.get_event_loop().time()
         
         while True:
             elapsed = asyncio.get_event_loop().time() - start_time
             if elapsed > timeout:
-                raise HTTPException(504, "Generation timeout")
+                raise HTTPException(504, f"Generation timeout after {timeout}s")
             
             response = await client.get(f"{COMFYUI_URL}/history/{prompt_id}")
             if response.status_code == 200:

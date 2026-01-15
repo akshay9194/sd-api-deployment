@@ -49,8 +49,8 @@ security = HTTPBearer(auto_error=False)
 COMFYUI_URL = os.getenv("COMFYUI_URL", "http://127.0.0.1:8188")
 API_KEY = os.getenv("API_KEY", "")
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/workspace/ComfyUI/output"))
-DEFAULT_STEPS = int(os.getenv("DEFAULT_STEPS", "25"))
-DEFAULT_CFG = float(os.getenv("DEFAULT_CFG", "7.0"))
+DEFAULT_STEPS = int(os.getenv("DEFAULT_STEPS", "32"))
+DEFAULT_CFG = float(os.getenv("DEFAULT_CFG", "6.0"))
 DEFAULT_WIDTH = int(os.getenv("DEFAULT_WIDTH", "1024"))
 DEFAULT_HEIGHT = int(os.getenv("DEFAULT_HEIGHT", "1024"))
 MODEL_NAME = os.getenv("MODEL_NAME", "juggernautXL_v9.safetensors")
@@ -60,28 +60,16 @@ ENABLE_SAFETY = os.getenv("ENABLE_SAFETY", "true").lower() == "true"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ═══════════════════════════════════════════════════════════════
-# Safety Constants (Adult Reinforcement)
+# Global Negative Prompt (Mandatory for Realism)
 # ═══════════════════════════════════════════════════════════════
-ADULT_REINFORCEMENT_POSITIVE = """
-clearly adult woman, fully mature adult, 25+ years old,
-adult body proportions, mature facial structure,
-adult woman in her mid-twenties, grown woman
-"""
-
-ADULT_REINFORCEMENT_NEGATIVE = """
-teen, teenage, teenager, young-looking, youthful face,
-childlike, petite youthful, baby face, underage,
-minor, child, kid, school age, juvenile,
-small body, undeveloped, immature
-"""
-
-SAFETY_NEGATIVE_PROMPT = """
-celebrity, famous person, actress, actor, model, influencer,
-public figure, real person, known face, instagram face,
-paparazzi photo, magazine cover, red carpet,
-politician, singer, athlete, TV personality,
-photograph of real person, mugshot, ID photo,
-deepfake, face swap
+GLOBAL_NEGATIVE_PROMPT = """
+celebrity, famous person, actor, actress, influencer, model,
+real person, known face, instagram face, tiktok face,
+beauty filter, airbrushed skin, plastic skin,
+anime, illustration, painting, cgi, 3d render,
+teen, teenage, young-looking, childlike, youthful face,
+school uniform, student, cosplay,
+distorted face, extra fingers, deformed eyes
 """
 
 # ═══════════════════════════════════════════════════════════════
@@ -166,16 +154,16 @@ def validate_prompt(prompt: str) -> tuple[bool, str]:
     return True, ""
 
 def build_safe_prompt(prompt: str, negative_prompt: str = "") -> tuple[str, str]:
-    """Build prompt with safety reinforcements"""
-    # Add adult reinforcement to positive prompt
-    safe_prompt = f"{ADULT_REINFORCEMENT_POSITIVE}, {prompt}"
+    """Build prompt with global negative prompt for realism"""
+    # Use prompt directly - no automatic modifications
+    safe_prompt = prompt.strip()
     
-    # Combine negative prompts
-    combined_negative = f"{ADULT_REINFORCEMENT_NEGATIVE}, {SAFETY_NEGATIVE_PROMPT}"
+    # Combine user negative with global mandatory negative
+    combined_negative = GLOBAL_NEGATIVE_PROMPT.strip()
     if negative_prompt:
         combined_negative = f"{negative_prompt}, {combined_negative}"
     
-    return safe_prompt.strip(), combined_negative.strip()
+    return safe_prompt, combined_negative.strip()
 
 # ═══════════════════════════════════════════════════════════════
 # ComfyUI Workflow Builder
@@ -193,7 +181,7 @@ def build_comfyui_workflow(
 ) -> dict:
     """Build ComfyUI workflow JSON for SDXL"""
     
-    # Basic SDXL txt2img workflow
+    # Basic SDXL txt2img workflow (Production-tuned for Juggernaut-XL)
     workflow = {
         "3": {
             "class_type": "KSampler",
@@ -201,8 +189,8 @@ def build_comfyui_workflow(
                 "seed": seed,
                 "steps": steps,
                 "cfg": cfg,
-                "sampler_name": "euler",
-                "scheduler": "normal",
+                "sampler_name": "dpmpp_2m",
+                "scheduler": "karras",
                 "denoise": 1.0,
                 "model": ["4", 0],
                 "positive": ["6", 0],

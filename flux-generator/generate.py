@@ -75,10 +75,10 @@ def load_pipeline(device: str = "cuda"):
         torch_dtype=dtype,
     )
 
-    # Enable sequential CPU offload — keeps only the active layer on GPU
-    # This lets FLUX run on a single 24GB GPU (RTX 4090)
-    pipe.enable_sequential_cpu_offload()
-    logger.info("Sequential CPU offload enabled (fits 24GB VRAM)")
+    # Model-level CPU offload — much faster than sequential (layer-level)
+    # Keeps entire submodels on GPU while active, swaps between them
+    pipe.enable_model_cpu_offload()
+    logger.info("Model CPU offload enabled (fast mode, fits 24GB VRAM)")
 
     logger.info(f"Loading LoRA: {LORA_REPO}")
     pipe.load_lora_weights(

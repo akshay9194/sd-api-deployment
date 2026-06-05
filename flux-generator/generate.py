@@ -64,7 +64,7 @@ logger = logging.getLogger(__name__)
 # ═══════════════════════════════════════════════════════════════
 
 def load_pipeline(device: str = "cuda"):
-    """Load Flux base model + LoRA weights."""
+    """Load Flux base model + LoRA weights with memory optimization."""
     from diffusers import AutoPipelineForText2Image
 
     dtype = torch.bfloat16 if TORCH_DTYPE == "bfloat16" else torch.float16
@@ -74,7 +74,11 @@ def load_pipeline(device: str = "cuda"):
         BASE_MODEL,
         torch_dtype=dtype,
     )
-    pipe.to(device)
+
+    # Enable sequential CPU offload — keeps only the active layer on GPU
+    # This lets FLUX run on a single 24GB GPU (RTX 4090)
+    pipe.enable_sequential_cpu_offload()
+    logger.info("Sequential CPU offload enabled (fits 24GB VRAM)")
 
     logger.info(f"Loading LoRA: {LORA_REPO}")
     pipe.load_lora_weights(
@@ -108,7 +112,8 @@ def generate_single(
     device: str = "cuda",
 ) -> bytes:
     """Generate a single image and return PNG bytes."""
-    generator = torch.Generator(device=device).manual_seed(seed)
+    # Use CPU generator — compatible with sequential CPU offload
+    generator = torch.Generator(device="cpu").manual_seed(seed)
 
     result = pipe(
         prompt=prompt,

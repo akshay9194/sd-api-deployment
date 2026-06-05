@@ -122,78 +122,78 @@ MOODS = [
 # ═══════════════════════════════════════════════════════════════
 
 SELFIE_SCENARIOS = [
-    "mirror selfie in bedroom, casual, ring light",
-    "outdoor selfie in garden, golden hour sunlight",
-    "car selfie, natural light through window",
-    "getting ready selfie, mirror, doing makeup",
-    "rooftop selfie, city skyline evening",
-    "cafe selfie, holding chai or coffee, cozy",
-    "gym selfie, post-workout glow, athletic wear",
-    "hotel room selfie, luxury bed behind, travel vibes",
-    "sunset selfie on balcony, golden warm lighting",
-    "morning selfie, just woke up, messy hair, natural beauty",
-    "festival selfie, fairy lights background, festive",
-    "poolside selfie, sunglasses, summer vibes",
+    "mirror selfie, bedroom, ring light",
+    "outdoor selfie, garden, golden hour",
+    "car selfie, natural light",
+    "getting ready, mirror selfie",
+    "rooftop selfie, city evening",
+    "cafe selfie, holding chai",
+    "gym selfie, post-workout",
+    "hotel room selfie, travel",
+    "sunset selfie, balcony",
+    "morning selfie, just woke up",
+    "festival selfie, fairy lights",
+    "poolside selfie, sunglasses",
 ]
 
 PORTRAIT_SCENARIOS = [
-    "studio portrait, soft warm backdrop, Bollywood style",
-    "window light portrait, sheer curtains, dreamy indoor",
-    "outdoor portrait, lush green garden background",
-    "golden hour portrait, warm golden tones, magic hour",
-    "urban portrait, modern Indian city background",
-    "indoor portrait, cozy decorated room, warm lights",
-    "rain portrait, glass window with water drops, moody",
-    "terrace portrait, evening sky, dramatic lighting",
-    "candlelit portrait, intimate warm glow, romantic",
-    "morning light portrait, soft sunrise tones, fresh",
-    "festive portrait, diwali lights or lanterns background",
-    "bookshelf background portrait, intellectual aesthetic",
+    "studio portrait, soft backdrop",
+    "window light portrait, dreamy",
+    "outdoor portrait, green garden",
+    "golden hour portrait, warm tones",
+    "urban portrait, city background",
+    "indoor portrait, cozy room",
+    "rain portrait, window drops",
+    "terrace portrait, evening sky",
+    "candlelit portrait, warm glow",
+    "morning light portrait, sunrise",
+    "festive portrait, diwali lights",
+    "bookshelf background portrait",
 ]
 
 FULL_BODY_SCENARIOS = [
-    "standing on city street, modern Indian urban fashion",
-    "walking on Goa beach, casual boho style",
-    "posing in studio, clean white background, fashion shoot",
-    "standing in lush park, trees and sunlight",
-    "leaning against vintage wall, old city aesthetic",
-    "standing in ornate doorway, haveli architecture",
-    "outdoor marble steps, palace or temple backdrop",
-    "rooftop with city skyline, evening golden hour",
-    "garden walkway, flowers and greenery",
-    "luxury hotel lobby, chandelier, elegant interior",
-    "railway platform or vintage train, travel aesthetic",
-    "marketplace street, colorful background, vibrant India",
+    "city street, urban fashion",
+    "Goa beach, casual boho",
+    "studio, white background",
+    "park, trees and sunlight",
+    "vintage wall, old city",
+    "ornate doorway, haveli",
+    "marble steps, palace",
+    "rooftop, city skyline",
+    "garden walkway, flowers",
+    "hotel lobby, elegant",
+    "train platform, travel",
+    "marketplace, colorful",
 ]
 
 LIFESTYLE_SCENARIOS = [
-    "sitting at cafe, holding chai cup, cozy Indian cafe",
-    "cooking in kitchen, making chai or food, home setting",
-    "reading a book on cozy sofa, warm indoor lighting",
-    "working on laptop, modern workspace, focused",
-    "shopping in market, colorful bags, city vibes",
-    "eating at restaurant, candle dinner, romantic setting",
-    "yoga pose, morning light, terrace or garden, peaceful",
-    "walking in park, morning jog, earphones, active",
-    "balcony garden, watering plants, golden hour",
-    "painting or sketching, art corner, creative mood",
-    "temple or spiritual setting, peaceful prayerful",
-    "bike ride or scooter, helmet, city adventure",
+    "cafe, holding chai cup",
+    "cooking in kitchen, home",
+    "reading book, cozy sofa",
+    "working on laptop, office",
+    "shopping, colorful bags",
+    "restaurant, candle dinner",
+    "yoga pose, morning terrace",
+    "walking in park, morning",
+    "balcony garden, plants",
+    "painting, art corner",
+    "temple, peaceful setting",
+    "scooter ride, city",
 ]
 
 FASHION_SCENARIOS = [
-    "wearing trendy Indo-western fusion outfit, urban backdrop",
-    "elegant lehenga or sherwani, wedding reception setting",
-    "sporty athletic wear, modern gym setting",
-    "cozy oversized hoodie, rainy day window, warm vibes",
-    "floral summer dress or linen kurta, outdoor garden",
-    "sharp formal wear, glass office building, corporate",
-    "bohemian style, Goa beach vibes, festival aesthetic",
-    "denim jacket, rooftop party, fairy lights, evening",
-    "traditional festive wear, Diwali or Eid celebration",
-    "luxury designer outfit, five star hotel, premium feel",
-    "casual streetwear, sneakers, mall or city walk",
-    "elegant saree or kurta pajama, classical Indian occasion",
+    "Indo-western fusion, urban",
+    "lehenga, wedding reception",
+    "athletic wear, gym",
+    "oversized hoodie, rainy window",
+    "summer dress, outdoor garden",
+    "formal wear, glass office",
+    "bohemian style, Goa beach",
+    "denim jacket, rooftop party",
+    "festive wear, Diwali",
+    "designer outfit, luxury hotel",
+    "casual streetwear, sneakers",
+    "elegant saree, occasion",
 ]
 
 CATEGORY_SCENARIOS = {
@@ -222,7 +222,7 @@ class PersonaConfig:
     tags: List[str] = field(default_factory=list)
 
 
-PHOTO_QUALITY = "photograph, real person, raw photo, natural skin pores, DSLR"
+PHOTO_QUALITY = "raw photo, DSLR"
 
 PERSONAS: Dict[str, PersonaConfig] = {
 
@@ -235,11 +235,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=22,
         archetype="Cute desi girl next door — your college crush who texts back",
         base_prompt=(
-            "beautiful young Indian woman, 22 years old, petite slim body, "
-            "long straight silky black hair, big expressive brown eyes, "
-            "cute dimples, soft round face, warm brown skin, "
-            "natural minimal makeup, nose pin, genuine bright smile, "
-            "wearing simple kurta or casual Indian fashion, "
+            "beautiful young Indian woman, 22, petite, "
+            "long straight black hair, big brown eyes, dimples, "
+            "warm brown skin, nose pin, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=100000,
@@ -253,11 +251,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=26,
         archetype="Bold Mumbai girl — confident, stylish, knows what she wants",
         base_prompt=(
-            "stunning Indian woman, 26 years old, tall slim fit body, "
-            "long wavy dark brown hair with highlights, sharp brown eyes, "
-            "defined jawline, medium fair skin, bold confident expression, "
-            "trendy western fashion, red lipstick, glamorous, "
-            "Bollywood actress level beauty, "
+            "stunning Indian woman, 26, tall slim, "
+            "wavy dark brown hair, sharp brown eyes, "
+            "fair skin, red lipstick, glamorous, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=200000,
@@ -271,11 +267,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=24,
         archetype="Traditional South Indian beauty — graceful, warm, classically gorgeous",
         base_prompt=(
-            "beautiful South Indian woman, 24 years old, curvy feminine body, "
-            "very long thick black hair, large dark brown eyes with kajal, "
-            "full lips, warm golden brown skin, traditional gold jewelry, "
-            "jasmine flowers in hair, warm inviting smile, "
-            "elegant saree or half-saree, classical Indian beauty, "
+            "beautiful South Indian woman, 24, curvy, "
+            "long thick black hair, dark brown eyes with kajal, "
+            "golden brown skin, gold jewelry, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=300000,
@@ -289,11 +283,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=21,
         archetype="Instagram baddie — edgy, trendy, lives for the aesthetic",
         base_prompt=(
-            "gorgeous young Indian woman, 21 years old, slim toned body, "
-            "shoulder-length black hair with streaks, intense dark eyes, "
-            "sharp features, light brown skin, edgy street style fashion, "
-            "multiple ear piercings, bold eyeliner, attitude in expression, "
-            "urban Indian aesthetic, influencer vibes, "
+            "gorgeous young Indian woman, 21, slim toned, "
+            "short black hair with streaks, intense dark eyes, "
+            "light brown skin, ear piercings, bold eyeliner, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=400000,
@@ -307,12 +299,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=29,
         archetype="Corporate queen — smart, sophisticated, intimidatingly attractive",
         base_prompt=(
-            "beautiful Indian woman, 29 years old, tall elegant body, "
-            "sleek black hair in low bun or straight blow-dry, "
-            "intelligent sharp brown eyes, high cheekbones, fair skin, "
-            "subtle sophisticated makeup, pearl earrings, "
-            "wearing blazer or elegant formal wear, powerful presence, "
-            "executive aesthetic, "
+            "beautiful Indian woman, 29, tall elegant, "
+            "sleek black hair, sharp brown eyes, fair skin, "
+            "pearl earrings, sophisticated, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=500000,
@@ -326,12 +315,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=25,
         archetype="Indo-Middle Eastern beauty — mysterious, exotic, unforgettable face",
         base_prompt=(
-            "stunningly beautiful mixed heritage woman, 25 years old, "
-            "slim hourglass body, long flowing dark wavy hair, "
-            "striking light brown eyes with green flecks, full lips, "
-            "olive tan skin, sharp nose, beauty mark near lips, "
-            "mysterious alluring expression, exotic elegant fashion, "
-            "Middle Eastern Indian fusion beauty, "
+            "stunning mixed heritage woman, 25, slim hourglass, "
+            "long dark wavy hair, light brown-green eyes, "
+            "olive tan skin, beauty mark, alluring, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=600000,
@@ -347,11 +333,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=28,
         archetype="The protective one — strong, reliable, makes you feel safe",
         base_prompt=(
-            "handsome Indian man, 28 years old, tall athletic muscular body, "
-            "short black hair with clean fade, strong jawline with stubble, "
-            "warm dark brown eyes, brown skin, broad shoulders, "
-            "confident protective expression, wearing fitted henley or kurta, "
-            "Bollywood hero physique, "
+            "handsome Indian man, 28, tall athletic muscular, "
+            "short black hair fade, strong jawline, stubble, "
+            "brown skin, broad shoulders, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=700000,
@@ -365,12 +349,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=26,
         archetype="Soulful musician — intense eyes, poetry in his voice, dangerous charm",
         base_prompt=(
-            "handsome Indian man, 26 years old, lean athletic body, "
-            "messy wavy black hair slightly long, intense deep brown eyes, "
-            "sharp features, light stubble, medium brown skin, "
-            "soulful brooding expression, wearing denim jacket or kurta, "
-            "tattoo on forearm, musician artist aesthetic, "
-            "rugged romantic charm, "
+            "handsome Indian man, 26, lean athletic, "
+            "messy wavy black hair, intense brown eyes, "
+            "stubble, medium brown skin, forearm tattoo, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=800000,
@@ -384,12 +365,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=32,
         archetype="Old money charm — sophisticated, well-traveled, effortlessly elegant",
         base_prompt=(
-            "handsome Indian man, 32 years old, tall well-built body, "
-            "neatly styled black hair, warm hazel brown eyes, "
-            "clean shaven, chiseled features, fair skin, "
-            "warm sophisticated smile, wearing tailored suit or blazer, "
-            "expensive watch, old money aesthetic, "
-            "distinguished gentleman presence, "
+            "handsome Indian man, 32, tall well-built, "
+            "neat black hair, hazel brown eyes, clean shaven, "
+            "fair skin, tailored suit, expensive watch, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=900000,
@@ -403,12 +381,9 @@ PERSONAS: Dict[str, PersonaConfig] = {
         age=24,
         archetype="Your best friend who's secretly in love — funny, sweet, always there",
         base_prompt=(
-            "handsome young Indian man, 24 years old, average fit body, "
-            "slightly messy black hair, warm friendly brown eyes, "
-            "boyish face, light stubble, warm brown skin, "
-            "genuine bright smile showing teeth, dimples, "
-            "wearing casual t-shirt or hoodie, approachable, "
-            "boy next door charm, "
+            "handsome young Indian man, 24, average fit, "
+            "messy black hair, friendly brown eyes, dimples, "
+            "warm brown skin, bright smile, "
             f"{PHOTO_QUALITY}"
         ),
         seed_base=1000000,

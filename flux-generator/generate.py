@@ -115,9 +115,9 @@ def generate_single(
     # Use CPU generator — compatible with sequential CPU offload
     generator = torch.Generator(device="cpu").manual_seed(seed)
 
+    # FLUX does not support negative_prompt — guidance_scale controls adherence
     result = pipe(
         prompt=prompt,
-        negative_prompt=negative_prompt,
         guidance_scale=GUIDANCE_SCALE,
         num_inference_steps=INFERENCE_STEPS,
         width=width,

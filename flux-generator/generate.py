@@ -34,6 +34,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+# Prevent CUDA OOM from memory fragmentation
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+
 import torch
 
 from config import (
@@ -259,6 +262,16 @@ def run_batch(
                     png_bytes = generate_single(
                         pipe, positive, negative, seed, width, height
                     )
+                except torch.cuda.OutOfMemoryError:
+                    logger.warning(f"  OOM on {key}, clearing cache and retrying...")
+                    torch.cuda.empty_cache()
+                    try:
+                        png_bytes = generate_single(
+                            pipe, positive, negative, seed, width, height
+                        )
+                    except Exception as e:
+                        logger.error(f"  FAILED {key} (retry): {e}")
+                        continue
                 except Exception as e:
                     logger.error(f"  FAILED {key}: {e}")
                     continue

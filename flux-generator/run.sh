@@ -58,7 +58,16 @@ echo "🖥️  GPU Info:"
 nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv,noheader
 echo ""
 
-# ── 5. Run generator ────────────────────────────────────────
+# ── 5. Start monitor dashboard ───────────────────────────────
+echo "📊 Starting monitor dashboard on port 8080..."
+python monitor.py &
+MONITOR_PID=$!
+sleep 2
+echo "   Dashboard: http://localhost:8080"
+echo "   On RunPod: https://YOUR-POD-ID-8080.proxy.runpod.net"
+echo ""
+
+# ── 6. Run generator ────────────────────────────────────────
 echo "🚀 Starting batch generation..."
 echo "   Output:    /workspace/generated_images/"
 echo "   Manifests: /workspace/manifests/"

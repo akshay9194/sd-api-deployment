@@ -78,10 +78,10 @@ def load_pipeline(device: str = "cuda"):
         torch_dtype=dtype,
     )
 
-    # Model-level CPU offload — much faster than sequential (layer-level)
-    # Keeps entire submodels on GPU while active, swaps between them
-    pipe.enable_model_cpu_offload()
-    logger.info("Model CPU offload enabled (fast mode, fits 24GB VRAM)")
+    # Sequential CPU offload — moves individual layers to GPU as needed
+    # Slower than model_cpu_offload but fits reliably in 24GB VRAM
+    pipe.enable_sequential_cpu_offload()
+    logger.info("Sequential CPU offload enabled (reliable 24GB VRAM mode)")
 
     logger.info(f"Loading LoRA: {LORA_REPO}")
     pipe.load_lora_weights(
@@ -132,6 +132,11 @@ def generate_single(
 
     buf = io.BytesIO()
     image.save(buf, format="PNG", optimize=True)
+
+    # Free VRAM between images to prevent fragmentation
+    del result, image
+    torch.cuda.empty_cache()
+
     return buf.getvalue()
 
 

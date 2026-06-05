@@ -54,7 +54,7 @@ def build_prompt(
         "mood": mood,
         "scenario": scenario,
         "tags": persona.tags + [category, mood.split()[0]],
-        "isNsfw": False,
+        "isNsfw": True,
     }
 
     return positive, negative, meta

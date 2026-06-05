@@ -168,6 +168,7 @@ def run_batch(
     category_filter: Optional[str] = None,
     skip_upload: bool = False,
     dry_run: bool = False,
+    limit_per_category: int = 0,
 ):
     """Run batch generation for selected personas and categories."""
 
@@ -190,9 +191,10 @@ def run_batch(
         categories = CATEGORIES
 
     # Count total work
-    total_images = sum(
-        cat["count"] for cat in categories.values()
-    ) * len(personas)
+    total_images = 0
+    for cat in categories.values():
+        effective = min(cat["count"], limit_per_category) if limit_per_category > 0 else cat["count"]
+        total_images += effective * len(personas)
 
     logger.info(f"═══════════════════════════════════════════════")
     logger.info(f"  XinMate Flux Batch Generator")
@@ -234,6 +236,8 @@ def run_batch(
 
         for cat_name, cat_cfg in categories.items():
             count = cat_cfg["count"]
+            if limit_per_category > 0:
+                count = min(count, limit_per_category)
             width, height = get_dimensions(cat_name)
 
             logger.info(f"\n  Category: {cat_name} ({count} images, {width}×{height})")
@@ -343,8 +347,7 @@ def _fmt_time(seconds: float) -> str:
 def main():
     parser = argparse.ArgumentParser(description="XinMate Flux Batch Image Generator")
     parser.add_argument("--persona", type=str, help="Generate for single persona (e.g., scarlett)")
-    parser.add_argument("--category", type=str, help="Generate single category (e.g., selfie)")
-    parser.add_argument("--skip-upload", action="store_true", help="Skip Azure upload, save locally only")
+    parser.add_argument("--category", type=str, help="Generate single category (e.g., selfie)")    parser.add_argument("--limit", type=int, default=0, help="Max images per category (0 = all). Use --limit 5 for testing")    parser.add_argument("--skip-upload", action="store_true", help="Skip Azure upload, save locally only")
     parser.add_argument("--dry-run", action="store_true", help="Preview prompts without generating")
     parser.add_argument("--list-personas", action="store_true", help="List all persona IDs")
 
@@ -362,6 +365,7 @@ def main():
         category_filter=args.category,
         skip_upload=args.skip_upload,
         dry_run=args.dry_run,
+        limit_per_category=args.limit,
     )
 
 

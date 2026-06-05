@@ -1,0 +1,22 @@
+# Flux Batch Generator - Dependencies
+# Run: pip install -r requirements.txt
+
+# Core
+torch>=2.1.0
+diffusers>=0.30.0
+transformers>=4.40.0
+accelerate>=0.30.0
+safetensors>=0.4.0
+peft>=0.10.0          # LoRA support
+sentencepiece>=0.2.0
+
+# Image
+Pillow>=10.0.0
+
+# Azure upload (stdlib urllib used, no extra deps)
+
+# DB import (optional)
+psycopg2-binary>=2.9.0
+
+# Monitoring
+tqdm>=4.65.0

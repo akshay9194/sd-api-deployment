@@ -105,3 +105,70 @@ python scripts/generate-persona-images.py
 | 10 | 140 | ~14 min |
 | 50 | 700 | ~70 min |
 | 100 | 1,400 | ~2.3 hours |
+
+---
+
+## Full Body Image Generation
+
+The standard generator creates **1024×1024** square images (great for selfies/portraits).  
+For full body shots, use the dedicated **full body generator** with a **832×1216** tall aspect ratio.
+
+### Key Differences from Portrait Generator
+
+| Setting | Portrait | Full Body |
+|---------|----------|-----------|
+| Resolution | 1024×1024 | 832×1216 |
+| Framing | Selfie / close-up | Head to toe |
+| Prompt extras | Expression-focused | Pose + outfit + shoes |
+| Seed offset | `seed_base + 0..999` | `seed_base + 5000..5999` |
+
+### Running the Full Body Generator
+
+```bash
+# Set your RunPod API URL
+export SD_API_URL="https://YOUR-POD-ID-8000.proxy.runpod.net"
+
+# Generate 10 full body images per persona (testing)
+export IMAGES_PER_PERSONA=10
+python scripts/generate-fullbody-images.py
+
+# Single persona only
+export PERSONA=scarlett
+python scripts/generate-fullbody-images.py
+
+# Full run (50 per persona = 650 total)
+export IMAGES_PER_PERSONA=50
+python scripts/generate-fullbody-images.py
+```
+
+### Full Body Scenarios
+
+| Scenario | Description |
+|----------|-------------|
+| standing_casual | Relaxed standing, urban street |
+| fashion_pose | Editorial model pose, studio |
+| walking | Walking toward camera, city |
+| leaning_wall | Leaning on wall, cool pose |
+| mirror_selfie | Full body mirror selfie |
+| doorway | Standing in doorway |
+| outdoor_nature | Park/garden, golden hour |
+| beach_full | Standing on beach |
+| gym_full | Athletic pose in gym |
+| date_arrival | Dressed up at restaurant |
+| staircase | Dramatic stair pose |
+| balcony | City skyline background |
+| bedroom_standing | Morning light, intimate |
+| red_carpet | Glamorous event |
+| cafe_standing | Outside cafe, casual |
+
+### Full Body Prompt Tips
+
+When crafting custom full body prompts, always include:
+```
+full body shot, head to toe, full length photo, showing feet, standing pose, wide framing
+```
+
+And add to negative prompt:
+```
+cropped, close up, portrait crop, face only, headshot, cut off legs, cut off feet
+```

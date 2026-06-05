@@ -346,8 +346,10 @@ def _fmt_time(seconds: float) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="XinMate Flux Batch Image Generator")
-    parser.add_argument("--persona", type=str, help="Generate for single persona (e.g., scarlett)")
-    parser.add_argument("--category", type=str, help="Generate single category (e.g., selfie)")    parser.add_argument("--limit", type=int, default=0, help="Max images per category (0 = all). Use --limit 5 for testing")    parser.add_argument("--skip-upload", action="store_true", help="Skip Azure upload, save locally only")
+    parser.add_argument("--persona", type=str, help="Generate for single persona (e.g., ananya)")
+    parser.add_argument("--category", type=str, help="Generate single category (e.g., selfie)")
+    parser.add_argument("--limit", type=int, default=0, help="Max images per category (0 = all). Use --limit 5 for testing")
+    parser.add_argument("--skip-upload", action="store_true", help="Skip Azure upload, save locally only")
     parser.add_argument("--dry-run", action="store_true", help="Preview prompts without generating")
     parser.add_argument("--list-personas", action="store_true", help="List all persona IDs")
 

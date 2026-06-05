@@ -19,10 +19,10 @@ LORA_WEIGHT_NAME = "lora.safetensors"
 LORA_ADAPTER_NAME = "uncensored"
 
 INFERENCE_STEPS = 28
-GUIDANCE_SCALE = 7.0
+GUIDANCE_SCALE = 3.5
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 1024
-TORCH_DTYPE = "float16"  # float16 for most GPUs, bfloat16 for A100
+TORCH_DTYPE = "bfloat16"  # FLUX was trained in bfloat16, produces sharper results
 
 # ═══════════════════════════════════════════════════════════════
 # AZURE BLOB CONFIG
@@ -50,31 +50,31 @@ CATEGORIES = {
     "selfie": {
         "count": 100,
         "db_category": "SELFIE",
-        "prompt_suffix": "selfie, close-up face, looking at camera, phone camera angle, natural lighting",
-        "dimensions": (1024, 1024),  # square for selfies
+        "prompt_suffix": "selfie, looking at camera, phone angle",
+        "dimensions": (1024, 1024),
     },
     "portrait": {
         "count": 100,
         "db_category": "PORTRAIT",
-        "prompt_suffix": "portrait, upper body, soft lighting, professional photography, bokeh background",
+        "prompt_suffix": "portrait, upper body, soft lighting",
         "dimensions": (1024, 1024),
     },
     "full_body": {
         "count": 100,
         "db_category": "FULL_BODY",
-        "prompt_suffix": "full body shot, head to toe, standing pose, wide framing, fashion photography",
-        "dimensions": (832, 1216),  # tall aspect ratio
+        "prompt_suffix": "full body shot, head to toe, standing",
+        "dimensions": (832, 1216),
     },
     "lifestyle": {
         "count": 100,
         "db_category": "CANDID",
-        "prompt_suffix": "candid shot, natural moment, lifestyle photography, authentic",
+        "prompt_suffix": "candid, natural moment",
         "dimensions": (1024, 1024),
     },
     "fashion": {
         "count": 100,
         "db_category": "MOOD",
-        "prompt_suffix": "fashion photography, stylish, editorial style, magazine quality",
+        "prompt_suffix": "fashion editorial, stylish",
         "dimensions": (1024, 1024),
     },
 }
@@ -222,11 +222,7 @@ class PersonaConfig:
     tags: List[str] = field(default_factory=list)
 
 
-PHOTO_QUALITY = (
-    "photorealistic, hyperrealistic detail, 8K resolution, "
-    "shot with Canon EOS R5, 85mm f/1.2 lens, natural skin texture, "
-    "professional color grading"
-)
+PHOTO_QUALITY = "photograph, real person, raw photo, natural skin pores, DSLR"
 
 PERSONAS: Dict[str, PersonaConfig] = {
 

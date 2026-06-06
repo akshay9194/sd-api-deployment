@@ -649,7 +649,7 @@ async function refresh(){
     let pv='';
     for(const img of imgs.slice(0,12)){
       const parts=img.key.split('/');
-      pv+='<div class="preview-card"><img src="/api/preview/'+parts[0]+'/'+parts[1]+'/'+parseInt(parts[2])+'" loading="lazy" onerror="this.style.display=\'none\'"><div class="info">'+img.key+' · '+img.mood+'</div></div>';
+      pv+='<div class="preview-card"><img src="/api/preview/'+parts[0]+'/'+parts[1]+'/'+parseInt(parts[2])+'" loading="lazy" onerror="this.style.display=`none`"><div class="info">'+img.key+' - '+img.mood+'</div></div>';
     }
     document.getElementById('previews').innerHTML=pv;
   }catch(e){console.error(e)}

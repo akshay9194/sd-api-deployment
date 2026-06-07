@@ -509,6 +509,149 @@ async def get_latest_images():
     return all_images[:20]
 
 
+# ── RE-UPLOAD ────────────────────────────────────────────────
+
+class ReuploadState:
+    running = False
+    total = 0
+    done = 0
+    failed = 0
+    errors: List[str] = []
+
+reupload = ReuploadState()
+
+
+def reupload_worker(persona_filter: Optional[List[str]] = None):
+    """Re-upload all locally saved images that don't have Azure URLs in manifest."""
+    try:
+        from upload import upload_image
+    except Exception as e:
+        reupload.errors.append(f"Upload module error: {e}")
+        reupload.running = False
+        return
+
+    try:
+        personas = {k: v for k, v in PERSONAS.items() if k in persona_filter} if persona_filter else PERSONAS
+        reupload.total = 0
+        reupload.done = 0
+        reupload.failed = 0
+        reupload.errors = []
+
+        # Count total needing upload
+        to_upload = []
+        for pid, pinfo in personas.items():
+            manifest = load_manifest(pid)
+            for img in manifest.get("images", []):
+                url = img.get("url", "")
+                if "blob.core.windows.net" not in url:
+                    key = img.get("key", "")
+                    local_path = Path(OUTPUT_DIR) / f"{key}.png"
+                    if local_path.exists():
+                        parts = key.split("/")
+                        to_upload.append((pid, pinfo, img, local_path, parts))
+
+        reupload.total = len(to_upload)
+        logger.info(f"Re-upload: {reupload.total} images to upload")
+
+        for pid, pinfo, img, local_path, parts in to_upload:
+            try:
+                with open(local_path, "rb") as f:
+                    png_bytes = f.read()
+
+                category = parts[1] if len(parts) > 1 else "unknown"
+                number = int(parts[2]) if len(parts) > 2 else 0
+
+                blob_url = ""
+                for attempt in range(3):
+                    try:
+                        blob_url = upload_image(png_bytes, pinfo.name, category, number)
+                        break
+                    except Exception as e:
+                        if attempt < 2:
+                            time.sleep(2 ** attempt)
+
+                if blob_url:
+                    # Update manifest with Azure URL
+                    manifest = load_manifest(pid)
+                    for m_img in manifest.get("images", []):
+                        if m_img.get("key") == img.get("key"):
+                            m_img["url"] = blob_url
+                            break
+                    save_manifest(pid, manifest)
+                    reupload.done += 1
+                    logger.info(f"  Re-uploaded [{reupload.done}/{reupload.total}] {img.get('key')}")
+                else:
+                    reupload.failed += 1
+                    reupload.errors.append(img.get("key", "unknown"))
+            except Exception as e:
+                reupload.failed += 1
+                reupload.errors.append(f"{img.get('key')}: {e}")
+
+        logger.info(f"Re-upload complete: {reupload.done} ok, {reupload.failed} failed")
+    except Exception as e:
+        logger.error(f"Re-upload crashed: {e}")
+    finally:
+        reupload.running = False
+
+
+@app.post("/api/reupload")
+async def start_reupload(req: StartRequest = StartRequest()):
+    if reupload.running:
+        raise HTTPException(409, "Re-upload already running")
+    if state.is_running:
+        raise HTTPException(409, "Generation running — stop it first")
+    reupload.running = True
+    t = threading.Thread(target=reupload_worker, args=(req.personas,), daemon=True)
+    t.start()
+    return {"status": "started"}
+
+
+@app.get("/api/reupload/status")
+async def reupload_status():
+    return {
+        "running": reupload.running,
+        "total": reupload.total,
+        "done": reupload.done,
+        "failed": reupload.failed,
+        "errors": reupload.errors[-10:],
+    }
+
+
+@app.get("/api/upload-check")
+async def upload_check():
+    """Check how many images need re-uploading."""
+    needs_upload = 0
+    already_uploaded = 0
+    missing_local = 0
+    by_persona = {}
+
+    for pid in PERSONAS:
+        manifest = load_manifest(pid)
+        p_needs = 0
+        p_done = 0
+        for img in manifest.get("images", []):
+            url = img.get("url", "")
+            if "blob.core.windows.net" in url:
+                already_uploaded += 1
+                p_done += 1
+            else:
+                local_path = Path(OUTPUT_DIR) / f"{img.get('key', '')}.png"
+                if local_path.exists():
+                    needs_upload += 1
+                    p_needs += 1
+                else:
+                    missing_local += 1
+        by_persona[pid] = {"needs_upload": p_needs, "uploaded": p_done}
+
+    return {
+        "needs_upload": needs_upload,
+        "already_uploaded": already_uploaded,
+        "missing_local": missing_local,
+        "by_persona": by_persona,
+        "azure_key_set": bool(os.getenv("AZURE_STORAGE_KEY")),
+    }
+
+
 # ═══════════════════════════════════════════════════════════════
 # DASHBOARD
 # ═══════════════════════════════════════════════════════════════
@@ -574,6 +717,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="controls">
   <button class="btn btn-start" id="btn-start" onclick="startGen()">▶ Start</button>
   <button class="btn btn-stop" id="btn-stop" onclick="stopGen()" disabled>⏹ Stop</button>
+  <button class="btn" id="btn-reupload" onclick="reupload()" style="background:#3b82f6;color:#fff">☁ Re-upload to Azure</button>
+  <span id="reupload-status" style="font-size:12px;color:#888;margin-left:8px"></span>
   <label style="font-size:12px;color:#888;margin-left:10px">Limit/cat:</label>
   <input class="input" id="limit" type="number" value="20" min="0" max="100" style="width:60px">
   <label style="font-size:12px;color:#888;margin-left:10px">Personas (blank=all):</label>
@@ -668,6 +813,29 @@ async function startGen(){
 async function stopGen(){
   await fetch('/api/stop',{method:'POST'});
   refresh();
+}
+
+async function reupload(){
+  const r=await fetch('/api/upload-check');
+  const d=await r.json();
+  if(!d.azure_key_set){alert('AZURE_STORAGE_KEY not set. Export it and restart server.');return;}
+  if(d.needs_upload===0){alert('All images already uploaded to Azure!');return;}
+  if(!confirm('Upload '+d.needs_upload+' images to Azure? ('+d.already_uploaded+' already done)')){return;}
+  const res=await fetch('/api/reupload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+  if(res.ok) refreshReupload();
+  else{const e=await res.json();alert(e.detail||'Error');}
+}
+
+async function refreshReupload(){
+  const r=await fetch('/api/reupload/status');
+  const d=await r.json();
+  const el=document.getElementById('reupload-status');
+  if(d.running){
+    el.textContent='Uploading: '+d.done+'/'+d.total+' ('+d.failed+' failed)';
+    setTimeout(refreshReupload,3000);
+  }else if(d.total>0){
+    el.textContent='Upload done: '+d.done+'/'+d.total+(d.failed?' ('+d.failed+' failed)':'');
+  }
 }
 
 refresh();

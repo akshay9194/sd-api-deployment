@@ -35,7 +35,7 @@ mkdir -p "$PIP_CACHE"
 
 echo "📦 Installing packages..."
 pip install --cache-dir "$PIP_CACHE" \
-    torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124 \
+    torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124 \
     2>/dev/null || true
 
 pip install --cache-dir "$PIP_CACHE" \
